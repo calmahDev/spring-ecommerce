@@ -1,18 +1,39 @@
 package com.curso.ecommerce.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "productos")
+
 public class Producto {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
 private Integer id;
 private String nombre;
 private String descripcion;
 private String imagen;
 private double precio;
 private int cantidad;
+@ManyToOne
+private Usuario usuario;
 
-public Producto() {
-}
 
-
-public Producto(Integer id, String nombre, String descripcion, String imagen, double precio, int cantidad) {
+/**
+ * @param id
+ * @param nombre
+ * @param descripcion
+ * @param imagen
+ * @param precio
+ * @param cantidad
+ * @param usuario
+ */
+public Producto(Integer id, String nombre, String descripcion, String imagen, double precio, int cantidad,
+		Usuario usuario) {
 	super();
 	this.id = id;
 	this.nombre = nombre;
@@ -20,7 +41,12 @@ public Producto(Integer id, String nombre, String descripcion, String imagen, do
 	this.imagen = imagen;
 	this.precio = precio;
 	this.cantidad = cantidad;
+	this.usuario = usuario;
 }
+
+public Producto() {
+}
+
 
 public Integer getId() {
 	return id;
@@ -71,6 +97,17 @@ public int getCantidad() {
 
 public void setCantidad(int cantidad) {
 	this.cantidad = cantidad;
+}
+
+
+
+public Usuario getUsuario() {
+	return usuario;
+}
+
+
+public void setUsuario(Usuario usuario) {
+	this.usuario = usuario;
 }
 
 
