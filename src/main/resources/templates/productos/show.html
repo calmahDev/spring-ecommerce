@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeLeaf.org">
 
 <head>
 
@@ -45,16 +45,16 @@
 					<th scope="col">Descripción</th>
 					<th scope="col">Inventario</th>
 					<th scope="col">Precio</th>
-					<th scope="col">Acción</th>
-					<th scope="col">Acción</th>
+					<th scope = "col">Accion</th>
+					<th scope = "col">Accion</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
+				<tr th:each ="producto : ${productos}">
+					<th scope="col" th:text ="${producto.nombre}"}>Nombre</th>
+					<th scope="col"th:text = "${producto.descripcion}">Descripción</th>
+					<th scope="col"th:text = "${producto.cantidad}">Inventario</th>
+					<th scope="col" th:text = "${producto.precio}">Precio</th>
 					<td><a class="btn btn-warning" href="">Editar</a> </td>
 					<td><a class="btn btn-danger" href="">Eliminar</a> </td>
 				</tr>
