@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.service.ProductoService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/")
@@ -37,4 +40,12 @@ public class HomeController {
 		model.addAttribute("producto",producto);
 		return "usuario/productohome";
 	}
+	
+	@PostMapping("/cart")
+	public String addCart() {
+		//TODO: process POST request
+		
+		return "usuario/carrito";
+	}
+	
 }
