@@ -34,7 +34,7 @@
       </h1>
 
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
         <li class="breadcrumb-item active">Orden</li>
       </ol>
 
@@ -47,9 +47,9 @@
               <h5 class="card-title">
                 DATOS ORDEN
               </h5>
-              <h6>Nombre: </h6>
-              <h6 >Correo: </h6>
-              <h6 >Dirección</h6>
+              <h6 th:text="'Nombre: '+${usuario.nombre}"> </h6>
+              <h6 th:text="'E-mail: '+${usuario.email}"> </h6>
+              <h6 th:text="'Direccion: '+${usuario.direccion}"></h6>
 
               <h5 class="card-title">
                 PRODUCTOS
@@ -64,12 +64,12 @@
                       <th scope="col">Total</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody th:each="dtProducto:${cart}">
                     <tr>
-                     <td >Nombre</td>
-                     <td >Precio</td>
-                     <td>Cantidad</td>
-                     <td >Total</td>
+                     <td th:text="${dtProducto.nombre}" ></td>
+                     <td th:text="${dtProducto.precio}"></td>
+                     <td th:text="${dtProducto.precio}"></td>
+                     <td th:text="${dtProducto.total}"></td>
 
                    </tr>
                  </tbody>
