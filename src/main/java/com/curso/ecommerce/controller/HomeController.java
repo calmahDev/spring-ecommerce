@@ -1,6 +1,7 @@
 package com.curso.ecommerce.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,11 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import com.curso.ecommerce.ResourceWebConfiguration;
 import com.curso.ecommerce.model.DetalleOrden;
 import com.curso.ecommerce.model.Orden;
 import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.model.Usuario;
+import com.curso.ecommerce.repository.IDetalleOrdenRepository;
+import com.curso.ecommerce.repository.IOrdenRepository;
+import com.curso.ecommerce.service.IDetalleOrdenService;
+import com.curso.ecommerce.service.IOrdenService;
 import com.curso.ecommerce.service.IUsuarioService;
 import com.curso.ecommerce.service.ProductoService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,17 +32,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 @RequestMapping("/")
 public class HomeController {
+
+    private final ResourceWebConfiguration resourceWebConfiguration;
+
+    private final IOrdenRepository IOrdenRepository;
 	private final Logger  log=LoggerFactory.getLogger(HomeController.class);
 	@Autowired
 	private ProductoService productoService;
 	@Autowired
 	private IUsuarioService usuarioService;
-	
+	@Autowired
+	private IOrdenService ordenService;
+	@Autowired
+	private IDetalleOrdenService detalleOrdenService;
 	
 	//para almacenar los detalles de la orden
 	List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
 	//datos de la orden
 	Orden orden = new Orden();
+
+    HomeController(IOrdenRepository IOrdenRepository, ResourceWebConfiguration resourceWebConfiguration) {
+        this.IOrdenRepository = IOrdenRepository;
+        this.resourceWebConfiguration = resourceWebConfiguration;
+    }
 	
 	@GetMapping("")
 	public String home(Model model) { 		
@@ -130,6 +147,29 @@ public class HomeController {
 		model.addAttribute("orden",orden);
 		model.addAttribute("usuario",usuario);
 		return "usuario/resumenorden";
+	}
+	@GetMapping("/saveOrder")
+	public String saveOrder() {
+		
+		Date fechaCreacion = new Date();
+		orden.setFechaCreacion(fechaCreacion);
+		
+		//usuario
+		Usuario usuario=usuarioService.findById(1).get();
+		
+		orden.setUsuario(usuario);
+		ordenService.save(orden);
+		
+		//guardar detalles
+		for(DetalleOrden dt:detalles) {
+			dt.setOrden(orden);
+			detalleOrdenService.save(dt);
+		}
+		
+		//limpiar lista
+		orden = new Orden();
+		detalles.clear();
+		return "redirect:/";
 	}
 	
 }
