@@ -21,6 +21,9 @@ import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.model.Usuario;
 import com.curso.ecommerce.service.ProductoService;
 import com.curso.ecommerce.service.UploadFileService;
+import com.curso.ecommerce.service.UsuarioServiceImpl;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/productos")
@@ -32,7 +35,8 @@ public class ProductoController {
 	private ProductoService productoService;
 	@Autowired
 	private UploadFileService upload;
-	
+	@Autowired
+	private UsuarioServiceImpl usuarioServiceImpl;
 	@GetMapping("")
 	public String show(Model model) {
 		model.addAttribute("productos",productoService.findAll());
@@ -45,9 +49,9 @@ public class ProductoController {
 	}
 	
 	@PostExchange("/save")
-	public String save(Producto producto,@RequestParam("img") MultipartFile file) throws Exception {
+	public String save(Producto producto,@RequestParam("img") MultipartFile file, HttpSession session) throws Exception {
 		LOGGER.info("Este es el objeto producto {}",producto);
-		Usuario u = new Usuario(1, null, null, null, null, null, null, null);
+		Usuario u = usuarioServiceImpl.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
 		producto.setUsuario(u);
 		//imagen
 		

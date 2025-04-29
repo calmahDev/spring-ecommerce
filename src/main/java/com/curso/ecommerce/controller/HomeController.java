@@ -27,6 +27,9 @@ import com.curso.ecommerce.service.IDetalleOrdenService;
 import com.curso.ecommerce.service.IOrdenService;
 import com.curso.ecommerce.service.IUsuarioService;
 import com.curso.ecommerce.service.ProductoService;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -59,7 +62,8 @@ public class HomeController {
     }
 	
 	@GetMapping("")
-	public String home(Model model) { 		
+	public String home(Model model, HttpSession session) { 		
+		log.info("sesion del usuario: {}",session.getAttribute("idusuario"));
 		model.addAttribute("productos",productoService.findAll());
 		return "usuario/home";
 	}
@@ -142,8 +146,8 @@ public class HomeController {
 		return "/usuario/carrito";
 	}
 	@GetMapping("/order")
-	public String order(Model model) {
-		Usuario usuario = usuarioService.findById(1).get();
+	public String order(Model model, HttpSession session) {
+		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
 		
 		model.addAttribute("cart",detalles);
 		model.addAttribute("orden",orden);
@@ -151,13 +155,13 @@ public class HomeController {
 		return "usuario/resumenorden";
 	}
 	@GetMapping("/saveOrder")
-	public String saveOrder() {
+	public String saveOrder(HttpSession sesion) {
 		
 		Date fechaCreacion = new Date();
 		orden.setFechaCreacion(fechaCreacion);
 		
 		//usuario
-		Usuario usuario=usuarioService.findById(1).get();
+		Usuario usuario=usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
 		
 		orden.setUsuario(usuario);
 		ordenService.save(orden);

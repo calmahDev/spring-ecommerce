@@ -45,7 +45,7 @@ public class UsuarioController {
 		Optional<Usuario> user= usuarioService.findByEmail(usuario.getEmail());
 	//	logger.info("Usuario de db: {}",user.get());
 		if(user.isPresent()) {
-			session.setAttribute("idUsuario", user.get().getId());
+			session.setAttribute("idusuario", user.get().getId());
 			if(user.get().getTipo().equals("admin")) {
 				return "redirect:/administrador";
 			}else {
