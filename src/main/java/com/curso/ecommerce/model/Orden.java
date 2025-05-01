@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -25,8 +26,8 @@ public class Orden {
 	private double total;
 	@ManyToOne
 	private Usuario usuario;
-	@OneToOne(mappedBy = "orden")
-	private DetalleOrden detalle;
+	@OneToMany(mappedBy = "orden")
+	private List<DetalleOrden> detalle;
 	
 	
 
@@ -40,7 +41,7 @@ public class Orden {
 	 * @param detalle
 	 */
 	public Orden(Integer id, String numero, Date fechaCreacion, Date fechaRecibida, double total, Usuario usuario,
-			DetalleOrden detalle) {
+			List<DetalleOrden> detalle) {
 		super();
 		this.id = id;
 		this.numero = numero;
@@ -103,14 +104,13 @@ public class Orden {
 	public void setTotal(double total) {
 		this.total = total;
 	}
-	
 
-	public DetalleOrden getDetalle() {
+	public List<DetalleOrden> getDetalle() {
 		return detalle;
 	}
 
 
-	public void setDetalle(DetalleOrden detalle) {
+	public void setDetalle(List<DetalleOrden> detalle) {
 		this.detalle = detalle;
 	}
 

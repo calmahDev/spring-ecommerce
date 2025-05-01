@@ -65,6 +65,7 @@ public class HomeController {
 	public String home(Model model, HttpSession session) { 		
 		log.info("sesion del usuario: {}",session.getAttribute("idusuario"));
 		model.addAttribute("productos",productoService.findAll());
+		model.addAttribute("session",session.getAttribute("idusuario"));
 		return "usuario/home";
 	}
 	
@@ -73,8 +74,7 @@ public class HomeController {
 		log.info("id enviado como parametro {}", id);
 		Producto producto = new Producto();
 		Optional<Producto> productoOptional = productoService.get(id);
-		producto = productoOptional.get();
-		
+		producto = productoOptional.get();		
 		model.addAttribute("producto",producto);
 		return "usuario/productohome";
 	}
@@ -84,99 +84,83 @@ public class HomeController {
 		//TODO: process POST request
 		DetalleOrden detalleOrden = new DetalleOrden() ;
 		Producto producto = new Producto();
-		double sumaTotal =0;
-		
+		double sumaTotal =0;		
 		Optional<Producto> optionalProducto =productoService.get(id);
 		log.info("prodcuto aniandio: {}",optionalProducto.get());
 		log.info("cantidad: {}",cantidad);
 		producto=optionalProducto.get();
-		
 		detalleOrden.setCantidad(cantidad);
 		detalleOrden.setPrecio(producto.getPrecio());
 		detalleOrden.setNombre(producto.getNombre());
 		detalleOrden.setTotal(producto.getPrecio()*cantidad);
 		detalleOrden.setProducto(producto);
-		
 		//validar que no se enliste mas de una veces el mismo producto
 		Integer idProducto =producto.getId();
 		boolean ingresado = detalles.stream().anyMatch(p -> p.getProducto().getId()==idProducto);	
-		
 		if(!ingresado) {
 			detalles.add(detalleOrden);
 		}
-		
 		sumaTotal=detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
-		
 		orden.setTotal(sumaTotal);
 		model.addAttribute("cart",detalles);
 		model.addAttribute("orden",orden);	
-		
 		return "usuario/carrito";
 	}
 	
 	@GetMapping("/delete/cart/{id}")
 	public String deleteProductoCart(@PathVariable Integer id, Model model) {
-		
 		List<DetalleOrden> ordenNueva = new ArrayList<DetalleOrden>();
 		for(DetalleOrden detalleOrden : detalles) {
 			if(detalleOrden.getProducto().getId() !=id) {
 				ordenNueva.add(detalleOrden);
 			}
 		}
-		
 		detalles = ordenNueva;
-		
-		
 		double sumaTotal=0;
 		sumaTotal = detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
-		
 		orden.setTotal(sumaTotal);
 		model.addAttribute("cart",detalles);
 		model.addAttribute("orden",orden);
-		
-		
 		return "usuario/carrito";
 	}
 	
 	@GetMapping("/getcart")
-	public String getCart(Model model) {
-		
+	public String getCart(Model model, HttpSession session) {
 		model.addAttribute("cart",detalles);
 		model.addAttribute("orden",orden);
+		//session
+		model.addAttribute("session",session.getAttribute("idusurio"));
 		return "/usuario/carrito";
 	}
+	
 	@GetMapping("/order")
 	public String order(Model model, HttpSession session) {
-		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
-		
+		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();	
 		model.addAttribute("cart",detalles);
 		model.addAttribute("orden",orden);
 		model.addAttribute("usuario",usuario);
 		return "usuario/resumenorden";
 	}
+	
 	@GetMapping("/saveOrder")
-	public String saveOrder(HttpSession sesion) {
-		
+	public String saveOrder(HttpSession session) {	
 		Date fechaCreacion = new Date();
-		orden.setFechaCreacion(fechaCreacion);
-		
+		orden.setFechaCreacion(fechaCreacion);		
 		//usuario
-		Usuario usuario=usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
-		
+		Usuario usuario=usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();		
 		orden.setUsuario(usuario);
-		ordenService.save(orden);
-		
+		ordenService.save(orden);		
 		//guardar detalles
 		for(DetalleOrden dt:detalles) {
 			dt.setOrden(orden);
 			detalleOrdenService.save(dt);
-		}
-		
+		}		
 		//limpiar lista
 		orden = new Orden();
 		detalles.clear();
 		return "redirect:/";
 	}
+	
 	@PostMapping("/search")
 	public String searchProducto(@RequestParam String nombre, Model model){
 		log.info("nombre del producto: {} ",nombre);  
