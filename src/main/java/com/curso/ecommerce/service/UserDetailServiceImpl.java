@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.curso.ecommerce.model.Usuario;
@@ -17,26 +17,36 @@ import com.curso.ecommerce.model.Usuario;
 import jakarta.servlet.http.HttpSession;
 
 @Service
-public class UserDetailServiceImpl implements UserDetailsService{
-	@Autowired
-	private IUsuarioService usuarioService;
-	@Autowired
-	private BCryptPasswordEncoder bCrypt;	
-	@Autowired
-	HttpSession session;
-	private Logger log = LoggerFactory.getLogger(UserDetailServiceImpl.class);
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		log.info("esto es el user name: ");
-		Optional<Usuario> optionaUser= usuarioService.findByEmail(username);
-		if(optionaUser.isPresent()) {
-			log.info("esto es el ID del usuario: {}",optionaUser.get().getId());
-			session.setAttribute("idusuario", optionaUser.get().getId());
-			Usuario usuario= optionaUser.get();
-			return User.builder().username(usuario.getNombre()).password(bCrypt.encode(usuario.getPassword())).roles(usuario.getTipo()).build();
-		}else {
-			throw new UsernameNotFoundException("usuario no encontrado");
-		}
-	}
+public class UserDetailServiceImpl implements UserDetailsService {
+    
+    @Autowired
+    private IUsuarioService usuarioService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private HttpSession session;
+    
+    private Logger log = LoggerFactory.getLogger(UserDetailServiceImpl.class);
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Esto es el username: {}", username);
+        Optional<Usuario> optionalUser = usuarioService.findByEmail(username);
+        
+        if(optionalUser.isPresent()) {
+            Usuario usuario = optionalUser.get();
+            log.info("Esto es el ID del usuario: {}", usuario.getId());
+            session.setAttribute("idusuario", usuario.getId());
+            
+            return User.builder()
+                .username(usuario.getNombre())
+                .password(usuario.getPassword()) // La contraseña ya debe estar codificada
+                .roles(usuario.getTipo())
+                .build();
+        } else {
+            throw new UsernameNotFoundException("Usuario no encontrado");
+        }
+    }
 }
