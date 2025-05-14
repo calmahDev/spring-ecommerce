@@ -49,14 +49,14 @@ public class UsuarioController {
 	public String login() {
 		return "usuario/login";
 	}
-	@PostMapping("/acceder")
+	@GetMapping("/acceder")
 	public String acceder (Usuario usuario,  HttpSession	session) {
 		logger.info("Acceder a : {}",usuario);
-		Optional<Usuario> user= usuarioService.findByEmail(usuario.getEmail());
-	//	logger.info("Usuario de db: {}",user.get());
+		Optional<Usuario> user= usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString()));
+//		logger.info("Usuario de db: {}",user.get());
 		if(user.isPresent()) {
 			session.setAttribute("idusuario", user.get().getId());
-			if(user.get().getTipo().equals("admin")) {
+			if(user.get().getTipo().equals("ADMIN")) {
 				return "redirect:/administrador";
 			}else {
 				return "redirect:/";
